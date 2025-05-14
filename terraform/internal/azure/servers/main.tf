@@ -15,6 +15,7 @@ module "network" {
   address_space = var.network.address_space
   airgap        = var.network.airgap
   open_ports    = var.network.open_ports
+  vpc_only_ports = var.network.vpc_only_ports
   peers         = var.active_directory != null ? { "${var.active_directory.name}" = {} } : {}
   dns_servers   = var.active_directory != null ? [var.active_directory.ip_address] : null
 
