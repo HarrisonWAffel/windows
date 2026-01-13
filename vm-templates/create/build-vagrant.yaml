@@ -2,7 +2,6 @@ menu:
   - entry: "Microsoft Windows"
     build:
       var_files:
-        - "vsphere.pkrvars.hcl"
         - "build.pkrvars.hcl"
         - "common.pkrvars.hcl"
     submenu:

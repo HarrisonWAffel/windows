@@ -84,14 +84,14 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
 
 build {
   sources = [
-    "source.virtualbox-iso.windows2025"
+    "source.virtualbox-iso.windows-server-datacenter-dexp"
   ]
 
   provisioner "windows-update" {
     search_criteria = "IsInstalled=0"
     update_limit    = 40
   }
-  #
+
   # provisioner "powershell" {
   #   scripts = [
   #     "setup/enable-winrm.ps1",
@@ -104,6 +104,6 @@ build {
   post-processor "vagrant" {
     keep_input_artifact = false
     output = "${local.custom_prefix}windows2025-virtualbox.box"
-    vagrantfile_template = "Vagrantfile.tpl"
+    vagrantfile_template = "${abspath(path.root)}/vagrantfile.tpl"
   }
 }
