@@ -43,7 +43,11 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
   guest_os_type          = "Windows2022_64"
   iso_url                = var.iso_url
   iso_checksum           = var.iso_checksum_value
-
+  iso_interface = "sata"
+  vboxmanage = [
+    [ "modifyvm", "{{.Name}}", "--firmware", "EFI" ]
+  ]
+  gfx_efi_resolution     = "1680x1050"
   communicator           = "winrm"
   winrm_username         = var.build_username
   winrm_password         = var.build_password
@@ -54,6 +58,9 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
   cpus                   = var.vm_cpu_sockets
   memory                 = var.vm_mem_size
   disk_size              = var.vm_disk_size
+
+  headless               = true
+  vrdp_bind_address      = "0.0.0.0"
 
   cd_content = {
     "autounattend.xml" = templatefile("${abspath(path.root)}/data/autounattend.pkrtpl.hcl", {
@@ -69,12 +76,12 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
     })
   }
 
-  # floppy_files           = [
-  #   "setup/install-vagrant-ssh-key.ps1",
-  #   "setup/enable-winrm.ps1",
-  #   "setup/cleanup.ps1",
-  #
-  # ]
+  cd_files = [
+    "${path.cwd}/scripts/${var.vm_guest_os_family}/",
+  ]
+
+  // Boot and Provisioning Settings
+  shutdown_timeout = var.common_shutdown_timeout
 
   boot_wait              = var.vm_boot_wait
   boot_command           = var.vm_boot_command
@@ -91,15 +98,6 @@ build {
     search_criteria = "IsInstalled=0"
     update_limit    = 40
   }
-
-  # provisioner "powershell" {
-  #   scripts = [
-  #     "setup/enable-winrm.ps1",
-  #     "setup/install-vagrant-ssh-key.ps1",
-  #     "setup/install-guest-additions.ps1",
-  #     "setup/cleanup.ps1"
-  #   ]
-  # }
 
   post-processor "vagrant" {
     keep_input_artifact = false

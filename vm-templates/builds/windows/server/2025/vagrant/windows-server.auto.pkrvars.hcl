@@ -49,11 +49,11 @@ vm_cdrom_type            = "sata"
 // to an instance. This name
 // differs from upstream.
 vm_cpu_sockets           = 16
-vm_cpu_cores             = 1
+vm_cpu_cores             = 4
 vm_cpu_hot_add           = false
 vm_mem_size              = 12288
 vm_mem_hot_add           = false
-vm_disk_size             = 40000
+vm_disk_size             = 80000
 vm_disk_controller_type  = ["pvscsi"]
 vm_disk_thin_provisioned = true
 vm_network_card          = "vmxnet3"
@@ -81,5 +81,5 @@ communicator_port    = 5985
 communicator_timeout = "12h"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-init.ps1"]
 finishScripts = ["scripts/windows/windows-finish.ps1"]
