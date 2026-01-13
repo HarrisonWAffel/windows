@@ -8,7 +8,7 @@
 set -euo pipefail
 
 SCRIPT_PATH=$(realpath "$(dirname "$(readlink -f "$0" 2>/dev/null || realpath "$0")")")
-CONFIG_PATH=$(realpath "${1:-../${SCRIPT_PATH}/config}")
+CONFIG_PATH=$(realpath "${1:-${SCRIPT_PATH}/config}")
 
 # Ensure we target the vm-templates root (parent of the "create" directory).
 # SCRIPT_PATH is the "create" directory, so its parent is the vm-templates root.
@@ -37,7 +37,7 @@ SUBMENU_ONLY=(
 )
 
 COMMON_VAR_FILES=(
-  "build.pkrvars.hcl common.pkrvars.hcl"
+   "build.pkrvars.hcl" "common.pkrvars.hcl"
 )
 
 # --- End static menu data ---
@@ -48,7 +48,7 @@ menu_option() {
   local submenu_message="${SUBMENU_MESSAGES[$idx]}"
   local submenu_path="${SUBMENU_PATHS[$idx]}"
   local submenu_only="${SUBMENU_ONLY[$idx]}"
-  local var_files="${VAR_FILES[0]}" # top-level menu var_files (from YAML)
+  local var_files="${COMMON_VAR_FILES[0]}" # top-level menu var_files (from YAML)
 
   # Build directories are children of the vm-templates root.
   INPUT_PATH="$VM_TEMPLATES_ROOT/$submenu_path"
