@@ -10,7 +10,7 @@ For tracking:
 For developers:
 
 - [terraform automation](./terraform) for standing up VMs
-- [packer automation](./vsphere-templates) for creating new vSphere Windows VM templates
+- [packer automation](vm-templates) for creating new vSphere Windows VM templates
 - [documentation](./docs) on multiple aspects of Windows in relation to Rancher
 
 The Windows on Rancher team is:

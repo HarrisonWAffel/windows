@@ -1,6 +1,6 @@
 /*
     DESCRIPTION:
-    Microsoft Windows Server 2022 variables using the Packer Builder for VMware vSphere (vsphere-iso).
+    Microsoft Windows Server 2025 variables using the Packer Builder for VMware vSphere (vsphere-iso).
 */
 
 //  BLOCK: variable

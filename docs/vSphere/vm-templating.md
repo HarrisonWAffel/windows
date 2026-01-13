@@ -35,7 +35,7 @@ Creating a Windows Server ISO requires knowledge of low level Windows components
 
 ### Hashicorp Packer
 
-Packer is a VM templating tool which provides a way to automatically create and manage VM templates in vSphere. It uses the hcl language to describe VM templates in a similar manner to how Terraform describes cloud infrastructure. Rancher maintains our own Packer templates for vSphere VM templates [here](../../vsphere-templates).
+Packer is a VM templating tool which provides a way to automatically create and manage VM templates in vSphere. It uses the hcl language to describe VM templates in a similar manner to how Terraform describes cloud infrastructure. Rancher maintains our own Packer templates for vSphere VM templates [here](../../vm-templates).
 
 
 The following sections speak on specific aspects of creating Windows VM templates. These nuances and details are already implemented in the Packer automation. Nevertheless, understanding the files which play a role in the process and why the automation uses specific settings is important for future maintenance.

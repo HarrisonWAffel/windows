@@ -9,127 +9,127 @@ menu:
       - entry: "Windows Server 2025 - All"
         message: "all Windows Server 2025 Templates"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
       - entry: "Windows Server 2025 - Standard Only (Core And Desktop)"
         message: "Microsoft Windows Server 2025 Standard Templates"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2025 - Standard Core Only"
         message: "Microsoft Windows Server 2025 Standard Core Template"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2025 - Standard Desktop Only"
         message: "Microsoft Windows Server 2025 Standard Desktop Template"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
       - entry: "Windows Server 2025 - Datacenter Only (Core And Desktop)"
         message: "Microsoft Windows Server 2025 Datacenter Templates"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2025 - Datacenter Core Only"
         message: "Microsoft Windows Server 2025 Datacenter Core Template"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2025 - Datacenter Desktop Only"
         message: "Microsoft Windows Server 2025 Datacenter Desktop Template"
         build:
-          path: "builds/windows/server/2025/"
+          path: "builds/windows/server/2025/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
       - entry: "Windows Server 2022 - All"
         message: "all Windows Server 2022 Templates"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
       - entry: "Windows Server 2022 - Standard Only (Core And Desktop)"
         message: "Microsoft Windows Server 2022 Standard Templates"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2022 - Standard Core Only"
         message: "Microsoft Windows Server 2022 Standard Core Template"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2022 - Standard Desktop Only"
         message: "Microsoft Windows Server 2022 Standard Desktop Template"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
       - entry: "Windows Server 2022 - Datacenter Only (Core And Desktop)"
         message: "Microsoft Windows Server 2022 Datacenter Templates"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2022 - Datacenter Core Only"
         message: "Microsoft Windows Server 2022 Datacenter Templates"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2022 - Datacenter Desktop Only"
         message: "Microsoft Windows Server 2022 Datacenter Templates"
         build:
-          path: "builds/windows/server/2022/"
+          path: "builds/windows/server/2022/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2019 - All"
         message: "all Windows Server 2019 Templates"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
       - entry: "Windows Server 2019 - Standard Only (Core And Desktop)"
         message: "Microsoft Windows Server 2019 Standard Templates"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2019 - Standard Core Only"
         message: "Microsoft Windows Server 2019 Standard Core Template"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-standard-core
       - entry: "Windows Server 2019 - Standard Desktop Only"
         message: "Microsoft Windows Server 2019 Standard Desktop Template"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-standard-dexp
       - entry: "Windows Server 2019 - Datacenter Only (Core And Desktop)"
         message: "Microsoft Windows Server 2019 Datacenter Templates"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2019 - Datacenter Core Only"
         message: "Microsoft Windows Server 2019 Datacenter Core Template"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-core
       - entry: "Windows Server 2019 - Datacenter Desktop Only"
         message: "Microsoft Windows Server 2019 Datacenter Desktop Template"
         build:
-          path: "builds/windows/server/2019/"
+          path: "builds/windows/server/2019/vsphere"
           only:
             - vsphere-iso.windows-server-datacenter-dexp
