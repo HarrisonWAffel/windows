@@ -374,11 +374,13 @@ variable "build_key" {
 variable "communicator_port" {
   type        = string
   description = "The port for the communicator protocol."
+  default = ""
 }
 
 variable "communicator_timeout" {
   type        = string
   description = "The timeout for the communicator protocol."
+  default = "1h"
 }
 
 // Provisioner Settings
