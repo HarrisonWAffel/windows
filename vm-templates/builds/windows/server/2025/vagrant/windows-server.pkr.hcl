@@ -43,11 +43,12 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
   guest_os_type          = "Windows2022_64"
   iso_url                = var.iso_url
   iso_checksum           = var.iso_checksum_value
-  iso_interface = "sata"
+  iso_interface = var.vm_cdrom_type
   vboxmanage = [
-    [ "modifyvm", "{{.Name}}", "--firmware", "EFI" ]
+    [ "modifyvm", "{{.Name}}", "--firmware", var.vm_firmware ],
   ]
   gfx_efi_resolution     = "1680x1050"
+
   communicator           = "winrm"
   winrm_username         = var.build_username
   winrm_password         = var.build_password
@@ -96,7 +97,33 @@ build {
 
   provisioner "windows-update" {
     search_criteria = "IsInstalled=0"
-    update_limit    = 40
+    filters = [
+      "exclude:$_.Title -like '*Preview*'",
+      "include:$true",
+    ]
+  }
+
+  provisioner "windows-restart" {
+    pause_before          = "10s"
+    restart_check_command = "powershell -command \"& {Write-Output 'restarted.'}\""
+    restart_timeout       = "10m"
+    max_retries           = 6
+  }
+
+  provisioner "powershell" {
+    environment_vars = [
+      "BUILD_USERNAME=${var.build_username}"
+    ]
+    elevated_user     = var.build_username
+    elevated_password = var.build_password
+    scripts           = formatlist("${path.cwd}/%s", var.preparationScripts)
+  }
+
+  provisioner "windows-restart" {
+    pause_before = "30s"
+    restart_check_command = "powershell -command \"& {Write-Output 'restarted.'}\""
+    restart_timeout       = "10m"
+    max_retries           = 6
   }
 
   post-processor "vagrant" {

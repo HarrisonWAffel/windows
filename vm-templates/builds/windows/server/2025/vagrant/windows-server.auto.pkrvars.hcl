@@ -42,29 +42,19 @@ vm_guest_os_experience_desktop = "dexp"
 vm_guest_os_type = "windows2022srvNext_64Guest"
 
 // Virtual Machine Hardware Settings
-vm_firmware              = "efi-secure"
+vm_firmware              = "EFI"
 vm_cdrom_type            = "sata"
-// vm_cpu_sockets is equivalent
-// to the amount of vCPU's assigned
-// to an instance. This name
-// differs from upstream.
-vm_cpu_sockets           = 16
+vm_cpu_sockets           = 6
 vm_cpu_cores             = 4
 vm_cpu_hot_add           = false
 vm_mem_size              = 12288
-vm_mem_hot_add           = false
 vm_disk_size             = 80000
-vm_disk_controller_type  = ["pvscsi"]
-vm_disk_thin_provisioned = true
-vm_network_card          = "vmxnet3"
 
 // Removable Media Settings
 // Note that these are specific
 // to the current vSphere environment,
 // and should changed when ISOs are uploaded
 // or removed
-iso_path           = "ISOs"
-iso_file           = "windows_2025_nov.iso"
 iso_url            = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso"
 iso_checksum_type  = "sha256"
 iso_checksum_value = "d0ef4502e350e3c6c53c15b1b3020d38a5ded011bf04998e950720ac8579b23d"
@@ -73,13 +63,10 @@ iso_checksum_value = "d0ef4502e350e3c6c53c15b1b3020d38a5ded011bf04998e950720ac85
 vm_boot_order       = "disk,cdrom"
 vm_boot_wait        = "2s"
 vm_boot_command     = ["<spacebar>"]
-// The unattend.xml file used here (sysprep_unattend.pkrtpl.hcl) differs from the initial unattend.xml file (autounattend.xml)
-vm_shutdown_command = "C:\\Windows\\system32\\Sysprep\\sysprep.exe /generalize /shutdown /oobe /mode:vm /unattend:C:\\autounattend.xml"
+vm_shutdown_command = "shutdown /s /t 60 /f /d p:4:1 /c \"Packer Shutdown\""
 
 // Communicator Settings
-communicator_port    = 5985
-communicator_timeout = "12h"
+communicator_timeout = "1h"
 
 // Provisioner Settings
 preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-init.ps1"]
-finishScripts = ["scripts/windows/windows-finish.ps1"]

@@ -266,11 +266,13 @@ variable "common_iso_datastore" {
 variable "iso_path" {
   type        = string
   description = "The path on the source vSphere datastore for ISO image. (e.g. 'iso/windows')"
+  default     = null
 }
 
 variable "iso_file" {
   type        = string
   description = "The file name of the ISO image used by the vendor. (e.g. '<language>_windows_server_version_<version>_updated_<month_year>_x64_dvd_<string>.iso')"
+  default     = null
 }
 
 variable "iso_checksum_type" {

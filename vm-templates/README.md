@@ -1,45 +1,59 @@
-# VMware vSphere Packer and Terraform Templates for Rancher
+# VMware vSphere, VirtualBox (Vagrant) Packer and Terraform Templates for Rancher
 
 > *Note*
 > 
-> This repository initially contained templates for Linux VMs. As they were not regularly used or tested, they have been removed. Refer to [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere) for a more up to date example of how to template linux VMs.
+> This repository initially contained templates for Linux VMs. As they were not regularly used or tested, they have been removed. Refer to [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere) for more up to date examples of how to template Linux VMs.
 
+> ⚠️ **WARNING**:
+>
+> While maintaining these templates, you **MUST** ensure that you do not commit sensitive information, such as passwords, keys, certificates, etc.
 
 <img alt="VMware vSphere 7.0 Update 2+" src="https://img.shields.io/badge/VMware%20vSphere-7.0%20Update%202+-blue?style=for-the-badge">
 <img alt="Packer 1.8.0+" src="https://img.shields.io/badge/HashiCorp%20Packer-1.8.0+-blue?style=for-the-badge&logo=packer">
 
 ## Table of Contents
-1. [Introduction](#Introduction)
-2. [Requirements](#Requirements)
-3. [Configuration](#Configuration)
-4. [Build](#Build)
-5. [Troubleshoot](#Troubleshoot)
-6. [Credits](#Credits)
+1. [Introduction](#introduction)
+2. [Requirements](#requirements)
+3. [Configuration](#configuration)
+4. [Build](#build)
+   - [vSphere template build process](#vsphere-template-build-process)
+   - [Vagrant template build process](#vagrant-template-build-process)
+5. [Troubleshoot](#troubleshoot)
+6. [Credits](#credits)
 
 ## Introduction
 
-*This project is a fork of the awesome [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere) repository on GitHub. It has been modified to better support configuration to work better with Rancher, RKE, and RKE2.*
+This repository is a fork of the upstream [packer-examples-for-vsphere](https://github.com/vmware-samples/packer-examples-for-vsphere) and has been adapted to support Windows machine image templates that work well with Rancher and RKE2. It contains Packer HCL templates and example Terraform plans to build Windows VM images for both VMware vSphere and VirtualBox (Vagrant) targets.
 
-This repository provides infrastructure-as-code examples to automate the creation of virtual machine images and their guest operating systems on VMware vSphere using [HashiCorp Packer][packer] and the [Packer Plugin for VMware vSphere][packer-plugin-vsphere] (`vsphere-iso`). All examples are authored in the HashiCorp Configuration Language ("HCL2").
+- vSphere: templates use the `vsphere-iso` Packer builder and support publishing to a vSphere Content Library.
+- Vagrant / VirtualBox: templates produce VirtualBox images packaged as Vagrant boxes (see builds/.../vagrant).
 
-Use of this project is mentioned in the **_VMware Validated Solution: Private Cloud Automation for VMware Cloud Foundation_** authored by the maintainer. Learn more about this solution at [vmware.com/go/vvs](https://vmware.com/go/vvs).
-
-By default, the machine image artifacts are transferred to a [vSphere Content Library][vsphere-content-library] as an OVF template and the temporary machine image is destroyed. If an item of the same name exists in the target content library, Packer will update the existing item with the new version of OVF template.
+By default, vSphere builds upload artifacts to a vSphere Content Library as an OVF template and destroy the temporary build VM. If an item of the same name exists, Packer updates the existing template.
 
 The following builds are available:
 
 **Microsoft Windows** - _Core and Desktop Experience_
+* Microsoft Windows Server 2025 - Standard and Datacenter
 * Microsoft Windows Server 2022 - Standard and Datacenter
 * Microsoft Windows Server 2019 - Standard and Datacenter
 
 ## Requirements
 
-**Packer**:
-* HashiCorp [Packer][packer-install] 1.8.0 or higher.
-* HashiCorp [Packer Plugin for VMware vSphere][packer-plugin-vsphere] (`vsphere-iso`) 1.0.3 or higher.
-* [Packer Plugin for Windows Updates][packer-plugin-windows-update] 0.14.0 or higher - a community plugin for HashiCorp Packer.
+This project requires several common tools for both vSphere and Vagrant/VirtualBox workflows. 
 
-    > Required plugins are automatically downloaded and initialized when using `./build.sh`. For dark sites, you may download the plugins and place these same directory as your Packer executable `/usr/local/bin` or `$HOME/.packer.d/plugins`.
+- HashiCorp Packer >= 1.8.0
+- VirtualBox (for Vagrant/VirtualBox builds) and Vagrant
+- VMware vSphere environment (for vsphere-iso builds) and credentials (if you plan vSphere builds)
+- Git
+- mkisofs/xorriso (or hdiutil on macOS) — for ISO manipulation in some helper scripts
+- mkpasswd (part of whois on some platforms) — used by some Windows provisioning helpers
+- coreutils (optional, depending on platform/script usage)
+- gomplate (optional, used by some template generation scripts)
+
+Additional software packages
+- Packer plugins (installed via `packer init` or manually): `packer-builder-vsphere`, `packer-builder-virtualbox`, `packer-post-processor-vagrant`, `packer-provisioner-shell`, `packer-provisioner-windows-update`, etc.
+- Terraform (if using the included example Terraform plans)
+- Any platform-specific tooling required to interact with your virtualization provider (vSphere SDK/CLI, VirtualBox Guest Additions management tools, etc.)
 
 **Operating Systems**:
 * openSUSE Tumbleweed
@@ -50,101 +64,74 @@ The following builds are available:
 
 The following software packages must be installed on the Packer host:
 
-* [Git][download-git] command-line tools.
-  - openSUSE: `zypper install git`
-  - Ubuntu: `apt-get install git`
-  - macOS: `brew install git`
-* A command-line .iso creator. Packer will use one of the following:
-  - **xorriso** on openSUSE: `zypper install xorriso`
-  - **mkisofs** on openSUSE: `zypper install mkisofs`
-  - **xorriso** on Ubuntu: `apt-get install xorriso`
-  - **mkisofs** on Ubuntu: `apt-get install mkisofs`
-  - **hdiutil** on macOS: native
-* mkpasswd
-  - openSUSE: `zypper install whois`
-  - Ubuntu: `apt-get install whois`
-  - macOS: `brew install --cask docker`
-* Coreutils
-  - macOS: `brew install coreutils`
-* HashiCorp [Terraform][terraform-install] 1.1.7 or higher and [Packer][packer-install] 1.8.0 or higher.
-  - openSUSE:
-    - `sudo zypper refresh && sudo zypper install -y gpg2 curl`
-    - `sudo rpm --import https://rpm.releases.hashicorp.com/gpg`
-    - `sudo zypper ar  https://rpm.releases.hashicorp.com/RHEL/35/x86_64/stable hashicorp`
-    - `sudo zypper refresh && zypper install terraform packer`
-  - Ubuntu:
-    - `sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl`
-    - `curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -`
-    - `sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"`
-    - `sudo apt-get update && sudo apt-get install terraform packer`
-  - macOS:
-    - `brew tap hashicorp/tap`
-    - `brew install hashicorp/tap/terraform`
-* [Gomplate](gomplate-install) 3.10.0 or higher.
-  - Only required if you are updating build.tmpl and build.sh 
-  - openSUSE:
-    - `sudo curl -o /usr/local/bin/gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/<version>/gomplate_<os>-<arch>`
-    - `sudo chmod 755 /usr/local/bin/gomplate`
-  - Ubuntu:
-    - `sudo curl -o /usr/local/bin/gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/<version>/gomplate_<os>-<arch>`
-    - `sudo chmod 755 /usr/local/bin/gomplate`
-  - macOS:
-    - `brew install gomplate`
-
-**Platform**:
+**Required vSphere Platform**:
 * VMware Cloud Foundation 4.2 or higher, or
 * VMware vSphere 7.0 Update 2 or higher
 
 ## Configuration
 
-The directory structure of the repository.
+This project has the following structure
 
-```console
-├── build.sh
-├── build.tmpl
-├── build.yaml
-├── config.sh
-├── set-envvars.sh
-├── README.md
+```
 ├── builds
-│   ├── build.pkvars.hcl.example
-│   ├── common.pkvars.hcl.example
-│   ├── proxy.pkvars.hcl.example
-│   ├── vsphere.pkvars.hcl.example
 │   └── windows
-│       └── <distribution>
-│           └── <version>
-│               ├── *.pkr.hcl
-│               ├── *.auto.pkrvars.hcl
-│               └── data
-│                   └── autounattend.pkrtpl.hcl
-├── certificates
-│   └── root-ca.cer.example
-├── manifests
-├── scripts
-│   └── windows
-│       └── *.ps1
-└── terraform
-    │── vsphere-role
-    └── vsphere-virtual-machine
+│       └── server
+│           ├── 2025
+│           |    ├──  vagrant # VirtualBox / Vagrant Packer templates and files
+│           |    |    ├── *.pkr.hcl
+│           |    |    ├── *.auto.pkrvars.hcl
+│           |    |    └── data
+│           |    |        └── autounattend.pkrtpl.hcl
+│           |    └── vsphere # vSphere Packer templates and files
+│           |         ├ *.pkr.hcl
+│           |         ├── *.auto.pkrvars.hcl
+│           |         └── data
+│           |             └── autounattend.pkrtpl.hcl
+│           ├── 2022
+│           |    ├──  vagrant
+│           |    |    ├── *.pkr.hcl
+│           |    |    ├── *.auto.pkrvars.hcl
+│           |    |    └── data
+│           |    |        └── autounattend.pkrtpl.hcl
+│           |    └── vsphere
+│           |         ├ *.pkr.hcl
+│           |         ├── *.auto.pkrvars.hcl
+│           |         └── data
+│           |             └── autounattend.pkrtpl.hcl
+│           └── 2019
+│               ├──  vagrant 
+│               |    ├── *.pkr.hcl
+│               |    ├── *.auto.pkrvars.hcl
+│               |    └── data
+│               |        └── autounattend.pkrtpl.hcl
+│               └── vsphere 
+│                    ├ *.pkr.hcl
+│                    ├── *.auto.pkrvars.hcl
+│                    └── data
+│                        └── autounattend.pkrtpl.hcl
+├── create/        # helper scripts (e.g., create/vagrant-build.sh)
+├── config/        # configuration; generate and edit for your environment
+├── scripts/       # shared provisioning and helper scripts executed during templating
+└── examples/      # example Terraform or usage snippets
 ```
 
 The files are distributed in the following directories.
 * **`builds`** - contains the templates, variables, and configuration files for the machine image build.
-* **`scripts`** - contains the scripts to initialize and prepare a Windows machine image build.
+* **`scripts`** - contains the scripts to initialize and prepare a Windows machine image template.
   * **This includes installing and configuring important dependencies, such as CloudBase init, as well as configuring access over SSH.**  
 * **`certificates`** - contains the Trusted Root Authority certificates for a Windows machine image build.
 * **`manifests`** - manifests created after the completion of the machine image build.
 * **`terraform`** - contains example Terraform plans to test machine image builds.
 
-> ⚠️ **WARNING**:
->
-> While maintaining these templates, you **MUST** ensure that you do not commit sensitive information, such as passwords, keys, certificates, etc.
+## Preparing for vSphere templating 
 
-### Step 2 - Download the Guest Operating Systems ISOs
+### Step: Download the Guest Operating Systems ISOs
+
+> *Note*
+> 
+> If you're building a Vagrant box, you can instead use the `iso_url` variable. Packer will automatically download the ISO at that URL and cache it. This is not supported for vSphere builds.
 
 1. Download the x64 guest operating system [.iso][iso] images.
-
     **Microsoft Windows**
     * Microsoft Windows Server 2022
       * [Download](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019) the latest Evaluation edition of Windows Server 2019
@@ -165,7 +152,7 @@ The files are distributed in the following directories.
     iso_checksum_value   = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     ```
 
-### Step 3 - Configure Service Account Privileges in vSphere
+### Step: Configure Service Account Privileges in vSphere
 
 Create a custom vSphere role with the required privileges to integrate HashiCorp Packer with VMware vSphere. A service account can be added to the role to ensure that Packer has least privilege access to the infrastructure. Clone the default **Read-Only** vSphere role and add the following privileges:
 
@@ -214,11 +201,11 @@ In an environment with many vCenter Server instances, such as management and wor
 2. Select the service account with the custom role assigned and click the **Change role** icon.
 3. In the **Change role** dialog box, from the **Role** drop-down menu, select **No Access**, select the **Propagate to children** check box, and click **OK**.
 
-### Step 4 - Configure the Variables
+## Step: Configure Build Variables
 
 The [variables][packer-variables] are defined in `.pkvars.hcl` files.
 
-#### **Copy the Example Variables**
+### **Copy the Example Variables**
 
 Run the config script `./config.sh` to copy the `.pkvars.hcl.example` files to the `config` directory.
 
@@ -249,7 +236,7 @@ For example, this is useful for the purposes of running machine image builds for
 ./build.sh config/us-west-2
 ```
 
-##### Build Variables
+#### Build Variables
 
 Edit the `config/build.pkvars.hcl` file to configure the following:
 
@@ -305,7 +292,7 @@ Your public key has been saved in /Users/rainpole/.ssh/id_ecdsa.pub.
 
 The content of the public key, `build_key`, is added the key to the `.ssh/authorized_keys` file of the `build_username` on the guest operating system.
 
-##### Common Variables
+#### Common Variables
 
 Edit the `config/common.pkvars.hcl` file to configure the following common variables:
 
@@ -340,7 +327,7 @@ common_ip_wait_timeout  = "20m"
 common_shutdown_timeout = "15m"
 ```
 
-##### Data Source Options
+#### Data Source Options
 
 `http` is the default provisioning data source for machine image builds.
 
@@ -352,7 +339,7 @@ The `cd_content` option is used when selecting `disk` unless the distribution do
 common_data_source = "disk"
 ```
 
-##### HTTP Binding
+#### HTTP Binding
 
 If you need to define a specific IPv4 address from your host for Packer's HTTP Server, modify the `common_http_ip` variable from `null` to a `string` value that matches an IP address on your Packer host. For example:
 
@@ -360,7 +347,7 @@ If you need to define a specific IPv4 address from your host for Packer's HTTP S
 common_http_ip = "172.16.11.254"
 ```
 
-##### Proxy Variables (Optional)
+#### Proxy Variables (Optional)
 
 Edit the `config/proxy.pkvars.hcl` file to configure the following:
 
@@ -376,7 +363,7 @@ communicator_proxy_username = "rainpole"
 communicator_proxy_password = "<plaintext_password>"
 ```
 
-##### vSphere Variables
+#### vSphere Variables
 
 Edit the `builds/vsphere.pkvars.hcl` file to configure the following:
 
@@ -444,58 +431,124 @@ These files are copied to the guest operating systems and added the certificate 
 
 ## Build
 
-### Generate a Custom Build Script
+This repository supports two primary build workflows. Each workflow shares common variables and scripts but targets different Packer builders and post-processors. The content below is consolidated so duplicate instructions have been removed; unique details have been preserved.
 
-The build script (`./build.sh`) can be generated using a template (`./build.tmpl`) and a configuration file in YAML (`./build.yaml`).
+### vSphere template build process
 
-Generate a custom build script:
+Follow these steps to build a vSphere template using the existing files and your configuration.
 
-```console
-rainpole@macos> gomplate -c build.yaml -f build.tmpl -o build.sh
-```
+1. Install prerequisites (see Requirements above)
+2. Prepare configuration
+   - Copy example variable files into a `config` directory using the included helper:
+     - `./config.sh`
+   - Edit the files in config/ (build.pkrvars.hcl, common.pkrvars.hcl, and any template-specific .pkrvars.hcl) to match your environment and desired VM settings (ISO path, checksums, build account, SSH keys, etc.).
+     - If further build specific configuration is required (such as Windows Server version specific ISO information) edit the `windows-server.auto.pkrvars.hcl` file in the relevant `builds` path (e.g. `builds/windows/server/2025/vagrant/windows-server.auto.pkrvars.hcl`) 
+3. Download and verify ISOs
+   - Download the Windows ISO(s) you intend to use and record checksum values in the appropriate config file (see the `iso_path`, `iso_file`, `iso_checksum_type` and `iso_checksum_value` variables).
 
-### Build with Variables Files
+4. Execute the custom build script
+   - Make sure the script is executable and run it from the repository root:
+     - chmod +x create/build-vsphere.sh
+     - ./create/build-vsphere.sh [config]
+   - The script is interactive: it presents a menu of available targets (e.g. Windows Server 2025 Datacenter Desktop) — choose the entry you want, optionally enter a custom template prefix, and confirm.
+   - The script runs `packer init` and then `packer build` for the selected VirtualBox targets. It assembles the correct `-var-file` arguments from your config folder.
 
-Start a build by running the build script (`./build.sh`). The script presents a menu the which simply calls Packer and the respective build(s).
-
-You can also start a build based on a specific source for some of the virtual machine images.
-
-For example, if you simply want to build a Microsoft Windows Server 2022 Standard Core, run the following:
-
-Initialize the plugins:
-
-```console
-rainpole@macos> packer init builds/windows/server/2022/.
-```
-
-Build a specific machine image:
-
-```console
-rainpole@macos> packer build -force \
-      --only vsphere-iso.windows-server-standard-core \
-      -var-file="config/vsphere.pkrvars.hcl" \
-      -var-file="config/build.pkrvars.hcl" \
-      -var-file="config/common.pkrvars.hcl" \
-      builds/windows/server/2022
-```
-
-### Build with Environmental Variables
-
-Initialize the plugins:
+5. Build with Variables Files
+   - Example Packer command to build a Windows Server 2025 Datacenter template for vSphere:
 
 ```console
-rainpole@macos> packer init builds/windows/server/2022/.
+packer build -force \
+  --only vsphere-iso.windows-server-datacenter \
+  -var-file="config/build.pkrvars.hcl" \
+  -var-file="config/common.pkrvars.hcl" \
+  builds/windows/server/2025/vsphere
 ```
 
-Build a specific machine image using environmental variables:
+> **Note**: The first time you run a build, Packer will take longer to complete as it installs the required plugins. Subsequent builds will be faster.
+
+6. Build with Environmental Variables
+   - If you prefer not to use variable files, you can set the required variables as environment variables. For example:
 
 ```console
-rainpole@macos> packer build -force \
-      --only vsphere-iso.windows-server-standard-core \
-      builds/windows/server/2022
+export PACKER_VAR_vsphere_username='svc-packer-vsphere@rainpole.io'
+export PACKER_VAR_vsphere_password='<plaintext_password>'
+export PACKER_VAR_common_iso_datastore='sfo-w01-cl01-ds-nfs01'
+export PACKER_VAR_iso_path='iso/linux/photon'
+export PACKER_VAR_iso_file='photon-4.0-xxxxxxxxx.iso'
+export PACKER_VAR_iso_checksum_type='md5'
+export PACKER_VAR_iso_checksum_value='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 ```
 
-Happy building!!!
+> **IMPORTANT**: Ensure sensitive information like passwords are not exposed in your shell history. Consider using a tool like `direnv` to manage environment variables in a secure manner.
+
+7. Content Library Behavior
+   - When using the `vsphere-iso` builder, Packer can upload the resulting template to a vSphere Content Library. The following variables control this behavior:
+     - `common_content_library_name`: Name of the Content Library to use.
+     - `common_content_library_ovf`: Set to `true` to upload as an OVF template.
+     - `common_content_library_destroy`: Set to `true` to destroy the temporary VM after template creation.
+
+> **Tip**: Using a Content Library can simplify template management in vSphere, especially when working with multiple vCenter instances or clusters.
+
+8. Role and Privilege Requirements
+   - Ensure the service account used by Packer has the necessary privileges in vSphere. Refer to the "Configure Service Account Privileges in vSphere" section for details.
+
+9. Example Packer command for `vsphere-iso`
+   - To build a Windows Server 2025 Datacenter template for vSphere using the `vsphere-iso` builder:
+
+```console
+packer build -force \
+  --only vsphere-iso.windows-server-datacenter \
+  -var-file="config/build.pkrvars.hcl" \
+  -var-file="config/common.pkrvars.hcl" \
+  builds/windows/server/2025/vsphere
+```
+
+### Vagrant template build process
+
+This repository includes an automated script to generate Vagrant boxes for Windows Server using Packer:
+
+- Script: create/vagrant-build.sh
+
+Follow these steps to create a Vagrant box (VirtualBox) using the provided script.
+
+1. Install prerequisites (see Requirements above)
+
+2. Prepare configuration
+   - Copy example variable files into a `config` directory using the included helper:
+     - ./config.sh config
+   - Edit the files in config/ (build.pkrvars.hcl, common.pkrvars.hcl, and any template-specific .pkrvars.hcl) to match your environment and desired VM settings (ISO path, checksums, build account, SSH keys, etc.).
+
+3. Download and verify ISOs
+   - Download the Windows ISO(s) you intend to use and record checksum values in the appropriate config file (set `iso_path`, `iso_file`, `iso_checksum_type` and `iso_checksum_value`).
+   - Alternatively, if you specify an `iso_url` in the `windows-server.auto.pkrvars.hcl` configuration Packer will automatically download and cache the ISO for you.
+
+4. Run the vagrant-build script
+   - Make the script executable and run it from the repository root:
+     - chmod +x create/vagrant-build.sh
+     - ./create/vagrant-build.sh config
+   - The script is interactive: it lists available Vagrant targets (e.g., Windows Server 2025 Datacenter Desktop). Choose the entry you want, optionally enter a custom template prefix, and confirm.
+   - The script runs `packer init` and then `packer build` for the selected VirtualBox targets and assembles the correct `-var-file` arguments from your config folder.
+
+5. Build artifacts
+   - On success, the VirtualBox `*.box` file is produced in the build directory (as configured by the Packer post-processor). The script prints completion information.
+
+6. Add the box to Vagrant and test
+   - vagrant box add --name my-windows-box /path/to/windowsXXXX-virtualbox.box
+   - Create a simple Vagrantfile and test:
+     - vagrant init my-windows-box
+     - vagrant up --provider=virtualbox
+
+Alternative (manual) packer command
+- If you prefer not to use the interactive script you can run Packer directly. Example to build the Windows Server 2025 Vagrant box:
+
+```console
+packer init builds/windows/server/2025/vagrant
+packer build -force \
+  --only virtualbox-iso.windows-server-datacenter-dexp \
+  -var-file="config/build.pkrvars.hcl" \
+  -var-file="config/common.pkrvars.hcl" \
+  builds/windows/server/2025/vagrant
+```
 
 ## Troubleshoot
 
