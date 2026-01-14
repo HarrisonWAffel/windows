@@ -374,7 +374,7 @@ variable "build_key" {
 variable "communicator_port" {
   type        = string
   description = "The port for the communicator protocol."
-  default = ""
+  default = "5985"
 }
 
 variable "communicator_timeout" {

@@ -66,7 +66,8 @@ vm_boot_command     = ["<spacebar>"]
 vm_shutdown_command = "shutdown /s /t 60 /f /d p:4:1 /c \"Packer Shutdown\""
 
 // Communicator Settings
-communicator_timeout = "1h"
+communicator_port    = 5985
+communicator_timeout = "12h"
 
 // Provisioner Settings
 preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-init.ps1"]
