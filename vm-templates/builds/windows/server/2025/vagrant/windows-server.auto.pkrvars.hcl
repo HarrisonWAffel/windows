@@ -70,4 +70,4 @@ communicator_port    = 5985
 communicator_timeout = "12h"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-init.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1"]
