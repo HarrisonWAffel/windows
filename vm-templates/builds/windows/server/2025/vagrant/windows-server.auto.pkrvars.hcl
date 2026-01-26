@@ -74,4 +74,4 @@ vagrant_username = "vagrant"
 vagrant_password = "vagrant"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-vmtools.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-vagrant-vmtools.ps1"]
