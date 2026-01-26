@@ -8,8 +8,10 @@
 >
 > While maintaining these templates, you **MUST** ensure that you do not commit sensitive information, such as passwords, keys, certificates, etc.
 
-<img alt="VMware vSphere 7.0 Update 2+" src="https://img.shields.io/badge/VMware%20vSphere-7.0%20Update%202+-blue?style=for-the-badge">
+<img alt="VMware vSphere 7.0 Update 2+" src="https://img.shields.io/badge/VMware%20vSphere-7.0%20Update%202+-darkblue?style=for-the-badge">
 <img alt="Packer 1.8.0+" src="https://img.shields.io/badge/HashiCorp%20Packer-1.8.0+-blue?style=for-the-badge&logo=packer">
+<img alt="Vagrant 1.1.6+" src="https://img.shields.io/badge/Vagrant-1.1.6+-lightblue?style=for-the-badge&logo=vagrant">
+<img alt="VirtualBox 1.1.3+" src="https://img.shields.io/badge/VirtualBox-1.1.3+-orange?style=for-the-badge&logo=virtualbox">
 
 ## Table of Contents
 1. [Introduction](#introduction)

@@ -50,8 +50,8 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
   gfx_efi_resolution     = "1680x1050"
 
   communicator           = "winrm"
-  winrm_username         = var.build_username
-  winrm_password         = var.build_password
+  winrm_username         = var.vagrant_username
+  winrm_password         = var.vagrant_password
   winrm_port             = var.communicator_port
   winrm_timeout          = var.communicator_timeout
 
@@ -65,8 +65,8 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
 
   cd_content = {
     "autounattend.xml" = templatefile("${abspath(path.root)}/data/autounattend.pkrtpl.hcl", {
-      build_username       = var.build_username
-      build_password       = var.build_password
+      build_username       = var.vagrant_username
+      build_password       = var.vagrant_password
       vm_inst_os_language  = var.vm_inst_os_language
       vm_inst_os_keyboard  = var.vm_inst_os_keyboard
       vm_inst_os_image     = var.vm_inst_os_image_datacenter_desktop_index
@@ -112,10 +112,10 @@ build {
 
   provisioner "powershell" {
     environment_vars = [
-      "BUILD_USERNAME=${var.build_username}"
+      "BUILD_USERNAME=${var.vagrant_username}"
     ]
-    elevated_user     = var.build_username
-    elevated_password = var.build_password
+    elevated_user     = var.vagrant_username
+    elevated_password = var.vagrant_password
     scripts           = formatlist("${path.cwd}/%s", var.preparationScripts)
   }
 
@@ -126,9 +126,38 @@ build {
     max_retries           = 6
   }
 
+  provisioner "file" {
+    // This file differs from the initial unattend.xml. This is responsible for
+    // user setup (OOBE), but not disk partitions or OS installation. Including fields
+    // that have already been set in the original unattend file may break sysprep.
+    content      = templatefile("${abspath(path.root)}/data/sysprep_unattend.pkrtpl.hcl", {
+      build_username       = var.vagrant_username
+      build_password       = var.vagrant_password
+      vm_inst_os_keyboard  = var.vm_inst_os_keyboard
+      vm_inst_os_language  = var.vm_inst_os_language
+      vm_inst_os_keyboard  = var.vm_inst_os_keyboard
+      vm_guest_os_timezone = var.vm_guest_os_timezone
+    })
+    destination = "C:\\autounattend.xml"
+  }
+
+  provisioner "shell-local" {
+    environment_vars = [
+      "BUILD_USERNAME=${var.vagrant_username}",
+      "BUILD_PASSWORD=${var.vagrant_password}"
+    ]
+    inline = [
+      "envsubst < Vagrantfile.tpl > Vagrantfile.pkg"
+    ]
+  }
+
   post-processor "vagrant" {
-    keep_input_artifact = false
-    output = "${local.custom_prefix}windows2025-virtualbox.box"
-    vagrantfile_template = "${abspath(path.root)}/vagrantfile.tpl"
+    keep_input_artifact = true
+    output = "output/windows2025-virtualbox.box"
+    vagrantfile_template = "Vagrantfile.pkg"
+  }
+
+  post-processor "shell-local" {
+    inline = ["rm Vagrantfile.pkg"]
   }
 }
