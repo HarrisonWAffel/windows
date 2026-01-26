@@ -403,3 +403,13 @@ variable "inline" {
   description = "A list of commands to run."
   default     = []
 }
+
+variable "vagrant_username" {
+  type = string
+  default = "vagrant"
+}
+
+variable "vagrant_password" {
+  type = string
+  default = "vagrant"
+}
