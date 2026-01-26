@@ -147,17 +147,17 @@ build {
       "BUILD_PASSWORD=${var.vagrant_password}"
     ]
     inline = [
-      "envsubst < Vagrantfile.tpl > Vagrantfile.pkg"
+      "envsubst < ${abspath(path.root)}/vagrantfile.tpl > ${abspath(path.root)}/Vagrantfile.pkg"
     ]
   }
 
   post-processor "vagrant" {
     keep_input_artifact = true
     output = "output/windows2025-virtualbox.box"
-    vagrantfile_template = "Vagrantfile.pkg"
+    vagrantfile_template = "${abspath(path.root)}/Vagrantfile.pkg"
   }
 
   post-processor "shell-local" {
-    inline = ["rm Vagrantfile.pkg"]
+    inline = ["rm ${abspath(path.root)}/Vagrantfile.pkg"]
   }
 }
