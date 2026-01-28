@@ -48,7 +48,7 @@ vm_cpu_sockets           = 6
 vm_cpu_cores             = 4
 vm_cpu_hot_add           = false
 vm_mem_size              = 12288
-vm_disk_size             = 20000
+vm_disk_size             = 40000
 
 // Removable Media Settings
 // Note that these are specific
@@ -63,7 +63,7 @@ iso_checksum_value = "d0ef4502e350e3c6c53c15b1b3020d38a5ded011bf04998e950720ac85
 vm_boot_order       = "disk,cdrom"
 vm_boot_wait        = "2s"
 vm_boot_command     = ["<spacebar>"]
-vm_shutdown_command = "C:\\Windows\\system32\\Sysprep\\sysprep.exe /generalize /shutdown /oobe /mode:vm /unattend:C:\\autounattend.xml"
+vm_shutdown_command = "powershell -executionpolicy bypass -command \"Start-Process -FilePath $env:SystemRoot\\system32\\sysprep\\sysprep.exe -ArgumentList '/generalize /shutdown /oobe /mode:vm /unattend:C:\\autounattend.xml'\""
 
 // Communicator Settings
 communicator_port    = 5985
@@ -74,4 +74,4 @@ vagrant_username = "vagrant"
 vagrant_password = "vagrant"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-vagrant-vmtools.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-disable-tpm.ps1", "scripts/windows/windows-vagrant-vmtools.ps1"]
