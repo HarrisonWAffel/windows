@@ -42,13 +42,13 @@ vm_guest_os_experience_desktop = "dexp"
 vm_guest_os_type = "windows2022srvNext_64Guest"
 
 // Virtual Machine Hardware Settings
-vm_firmware              = "EFI"
+vm_firmware              = "bios"
 vm_cdrom_type            = "sata"
 vm_cpu_sockets           = 6
 vm_cpu_cores             = 4
 vm_cpu_hot_add           = false
 vm_mem_size              = 12288
-vm_disk_size             = 40000
+vm_disk_size             = 25000
 
 // Removable Media Settings
 // Note that these are specific

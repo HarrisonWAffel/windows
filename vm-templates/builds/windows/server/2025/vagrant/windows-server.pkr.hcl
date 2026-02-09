@@ -71,6 +71,7 @@ source "virtualbox-iso" "windows-server-datacenter-dexp" {
       vm_guest_os_language = var.vm_guest_os_language
       vm_guest_os_keyboard = var.vm_guest_os_keyboard
       vm_guest_os_timezone = var.vm_guest_os_timezone
+      vm_additional_iso_path = ""
     })
   }
 
@@ -137,11 +138,13 @@ source "qemu" "windows-server-datacenter-dexp" {
       vm_guest_os_language = var.vm_guest_os_language
       vm_guest_os_keyboard = var.vm_guest_os_keyboard
       vm_guest_os_timezone = var.vm_guest_os_timezone
+      vm_additional_iso_path = '<PathAndCredentials wcm:action="add" key="0"><Path>E:\\viostor\\2k22\\amd64</Path></PathAndCredentials>'
     })
   }
 
   cd_files = [
     "${path.cwd}/scripts/${var.vm_guest_os_family}/",
+    "${path.cwd}/files/virtio-win.iso",
   ]
 
   // Boot and Provisioning Settings

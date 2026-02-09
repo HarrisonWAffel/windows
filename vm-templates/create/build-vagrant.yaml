@@ -5,9 +5,17 @@ menu:
         - "build.pkrvars.hcl"
         - "common.pkrvars.hcl"
     submenu:
-      - entry: "Windows Server 2025 - Datacenter Desktop Only"
+      - entry: "Windows Server 2025 - Virtual Box - Datacenter Desktop Only"
         message: "Microsoft Windows Server 2025 Datacenter Desktop Template"
         build:
+          provider: "virtualbox"
           path: "builds/windows/server/2025/vagrant"
           only:
             - virtualbox-iso.windows-server-datacenter-dexp
+      - entry: "Windows Server 2025 - libvirt - Datacenter Desktop Only"
+        message: "Microsoft Windows Server 2025 Datacenter Desktop Template"
+        build:
+          provider: "libvirt"
+          path: "builds/windows/server/2025/vagrant"
+          only:
+            - qemu.windows-server-datacenter-dexp

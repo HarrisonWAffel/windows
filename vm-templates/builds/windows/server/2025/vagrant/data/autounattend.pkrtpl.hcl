@@ -16,6 +16,7 @@
             <PathAndCredentials wcm:action="add" wcm:keyValue="1">
                <Path>E:\Program Files\VMware\VMware Tools\Drivers\pvscsi\Win8\amd64</Path>
             </PathAndCredentials>
+            ${vm_additional_iso_path}
          </DriverPaths>
       </component>
       <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
