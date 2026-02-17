@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    DESCRIPTION:
+    Unified Microsoft Windows Server 2025 unattended installation configuration.
+    Supports both VirtualBox and QEMU/KVM builds via templating.
+
+    Template variables:
+      - vm_virtualization_platform: "virtualbox" or "qemu" - controls driver paths and partitioning
+      - build_username/build_password: credentials for the build user
+      - vm_inst_os_language/keyboard: installation locale settings
+      - vm_inst_os_image: Windows edition index to install
+      - vm_guest_os_timezone: timezone setting
+
+    QEMU configuration uses IDE disk and e1000 network for maximum compatibility
+    (no special drivers required during Windows PE phase).
+-->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
    <settings pass="windowsPE">
       <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
@@ -11,20 +26,38 @@
          <UILanguageFallback>${vm_inst_os_language}</UILanguageFallback>
          <UserLocale>${vm_inst_os_language}</UserLocale>
       </component>
+%{ if vm_virtualization_platform == "virtualbox" ~}
       <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-PnpCustomizationsWinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
          <DriverPaths>
+            <!-- VirtualBox/VMware drivers -->
             <PathAndCredentials wcm:action="add" wcm:keyValue="1">
                <Path>E:\Program Files\VMware\VMware Tools\Drivers\pvscsi\Win8\amd64</Path>
             </PathAndCredentials>
-            ${vm_additional_iso_path}
          </DriverPaths>
       </component>
+%{ endif ~}
       <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <DiskConfiguration>
          <Disk wcm:action="add">
             <DiskID>0</DiskID>
             <WillWipeDisk>true</WillWipeDisk>
             <CreatePartitions>
+%{ if vm_virtualization_platform == "qemu" ~}
+               <!-- BIOS/MBR partitioning for QEMU -->
+               <!-- System Reserved partition -->
+               <CreatePartition wcm:action="add">
+                  <Order>1</Order>
+                  <Type>Primary</Type>
+                  <Size>500</Size>
+               </CreatePartition>
+               <!-- Windows partition -->
+               <CreatePartition wcm:action="add">
+                  <Order>2</Order>
+                  <Type>Primary</Type>
+                  <Extend>true</Extend>
+               </CreatePartition>
+%{ else ~}
+               <!-- UEFI/GPT partitioning for VirtualBox -->
                <!-- Windows RE Tools partition -->
                <CreatePartition wcm:action="add">
                   <Order>1</Order>
@@ -49,8 +82,27 @@
                   <Type>Primary</Type>
                   <Extend>true</Extend>
                </CreatePartition>
+%{ endif ~}
             </CreatePartitions>
             <ModifyPartitions>
+%{ if vm_virtualization_platform == "qemu" ~}
+               <!-- BIOS/MBR partition modifications for QEMU -->
+               <ModifyPartition wcm:action="add">
+                  <Order>1</Order>
+                  <PartitionID>1</PartitionID>
+                  <Label>System Reserved</Label>
+                  <Format>NTFS</Format>
+                  <Active>true</Active>
+               </ModifyPartition>
+               <ModifyPartition wcm:action="add">
+                  <Order>2</Order>
+                  <PartitionID>2</PartitionID>
+                  <Label>OS</Label>
+                  <Letter>C</Letter>
+                  <Format>NTFS</Format>
+               </ModifyPartition>
+%{ else ~}
+               <!-- UEFI/GPT partition modifications for VirtualBox -->
                <!-- Windows RE Tools partition -->
                <ModifyPartition wcm:action="add">
                   <Order>1</Order>
@@ -79,6 +131,7 @@
                   <Letter>C</Letter>
                   <Format>NTFS</Format>
                </ModifyPartition>
+%{ endif ~}
             </ModifyPartitions>
          </Disk>
       </DiskConfiguration>
@@ -90,14 +143,23 @@
                      <Value>${vm_inst_os_image}</Value>
                   </MetaData>
                </InstallFrom>
+%{ if vm_virtualization_platform == "qemu" ~}
+               <InstallTo>
+                  <DiskID>0</DiskID>
+                  <PartitionID>2</PartitionID>
+               </InstallTo>
+%{ else ~}
                <InstallToAvailablePartition>true</InstallToAvailablePartition>
+%{ endif ~}
             </OSImage>
          </ImageInstall>
          <UserData>
             <AcceptEula>true</AcceptEula>
             <FullName>${build_username}</FullName>
             <Organization>${build_username}</Organization>
-            <ProductKey/>
+            <ProductKey>
+               <WillShowUI>OnError</WillShowUI>
+            </ProductKey>
          </UserData>
          <EnableFirewall>false</EnableFirewall>
       </component>
@@ -179,11 +241,22 @@
                <RequiresUserInput>true</RequiresUserInput>
             </SynchronousCommand>
             <SynchronousCommand wcm:action="add">
-               <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
+               <CommandLine>%SystemRoot%\SysWOW64\WindowsPowerShell\v1.0\powershell.exe -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force"</CommandLine>
                <Description>Set Execution Policy 32-Bit</Description>
                <Order>2</Order>
                <RequiresUserInput>true</RequiresUserInput>
             </SynchronousCommand>
+%{ if vm_virtualization_platform == "qemu" ~}
+            <!-- QEMU/KVM: Run initialization script from Packer CD -->
+            <!-- With IDE disk and e1000 network, no special drivers needed -->
+            <!-- Search multiple drives since CD-ROM letters may vary -->
+            <SynchronousCommand wcm:action="add">
+               <CommandLine>cmd /c "for %%d in (D E F G) do if exist %%d:\windows-init.ps1 %SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File %%d:\windows-init.ps1"</CommandLine>
+               <Order>3</Order>
+               <Description>Initial Configuration</Description>
+            </SynchronousCommand>
+%{ else ~}
+            <!-- VirtualBox/VMware: Install guest tools -->
             <SynchronousCommand wcm:action="add">
                <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -File E:\windows-vmtools.ps1</CommandLine>
                <Order>3</Order>
@@ -194,6 +267,7 @@
                <Order>4</Order>
                <Description>Initial Configuration</Description>
             </SynchronousCommand>
+%{ endif ~}
          </FirstLogonCommands>
       </component>
    </settings>

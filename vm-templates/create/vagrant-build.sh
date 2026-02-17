@@ -51,79 +51,6 @@ COMMON_VAR_FILES=(
 
 # --- End static menu data ---
 
-VIRTIO_WIN_ISO_URL="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/stable-virtio/virtio-win.iso"
-
-download_virtio_win_iso() {
-  local data_dir="$1"
-  local iso_filename="virtio-win.iso"
-  local iso_path="$data_dir/files/$iso_filename"
-
-  # Check if ISO already exists
-  if [[ -f "$iso_path" ]]; then
-    echo ""
-    echo "==> virtio-win ISO already exists at: $iso_path"
-    echo -n "Do you want to re-download it? (y/n): "
-    read -r REPLY
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-      echo "Using existing ISO."
-      return 0
-    fi
-  fi
-
-  echo ""
-  echo "=========================================="
-  echo "VIRTIO-WIN ISO DOWNLOAD"
-  echo "=========================================="
-  echo "The libvirt/QEMU provider requires the"
-  echo "virtio-win ISO for Windows guest drivers."
-  echo ""
-  echo "Download location: $iso_path"
-  echo "=========================================="
-  echo ""
-  echo -n "Download virtio-win ISO? (y/n): "
-  read -r REPLY
-
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo ""
-    echo "WARNING: Build may fail without virtio-win ISO."
-    echo -n "Continue without downloading? (y/n): "
-    read -r CONTINUE_REPLY
-    if [[ ! $CONTINUE_REPLY =~ ^[Yy]$ ]]; then
-      echo "Build cancelled."
-      return 1
-    fi
-    return 0
-  fi
-
-  # Create data directory if it doesn't exist
-  mkdir -p "$data_dir" || {
-    echo "ERROR: Failed to create data directory: $data_dir"
-    return 1
-  }
-
-  echo ""
-  echo "==> Downloading virtio-win ISO..."
-  echo "    Source: $VIRTIO_WIN_ISO_URL"
-  echo "    Target: $iso_path"
-
-  if command -v curl &> /dev/null; then
-    curl -L -o "$iso_path" "$VIRTIO_WIN_ISO_URL" || {
-      echo "ERROR: Download failed"
-      return 1
-    }
-  elif command -v wget &> /dev/null; then
-    wget -O "$iso_path" "$VIRTIO_WIN_ISO_URL" || {
-      echo "ERROR: Download failed"
-      return 1
-    }
-  else
-    echo "ERROR: Neither curl nor wget found. Please install one of them."
-    return 1
-  fi
-
-  echo "==> Download completed successfully!"
-  return 0
-}
 
 menu_option() {
   local idx="$1"
@@ -144,11 +71,6 @@ menu_option() {
     return 1
   fi
 
-  # Handle virtio-win ISO download for libvirt provider
-  if [[ "$submenu_provider" == "libvirt" ]]; then
-    local data_dir="$INPUT_PATH/data"
-    download_virtio_win_iso "$data_dir" || return 1
-  fi
 
   echo ""
   echo "Do you want to provide a custom name prefix for this template?"

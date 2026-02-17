@@ -48,7 +48,7 @@ vm_cpu_sockets           = 6
 vm_cpu_cores             = 4
 vm_cpu_hot_add           = false
 vm_mem_size              = 12288
-vm_disk_size             = 25000
+vm_disk_size             = 51200
 
 // Removable Media Settings
 // Note that these are specific
@@ -63,7 +63,8 @@ iso_checksum_value = "d0ef4502e350e3c6c53c15b1b3020d38a5ded011bf04998e950720ac85
 vm_boot_order       = "disk,cdrom"
 vm_boot_wait        = "2s"
 vm_boot_command     = ["<spacebar>"]
-vm_shutdown_command = "powershell -executionpolicy bypass -command \"Start-Process -FilePath $env:SystemRoot\\system32\\sysprep\\sysprep.exe -ArgumentList '/generalize /shutdown /oobe /mode:vm /unattend:C:\\autounattend.xml'\""
+// Shutdown command is a fallback - sysprep is run by windows-shutdown.ps1 provisioner
+vm_shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
 
 // Communicator Settings
 communicator_port    = 5985
@@ -74,4 +75,10 @@ vagrant_username = "vagrant"
 vagrant_password = "vagrant"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-disable-tpm.ps1", "scripts/windows/windows-vagrant-vmtools.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-disable-tpm.ps1", "scripts/windows/windows-vagrant-vmtools.ps1", "scripts/windows/windows-qemu-tools.ps1"]
+
+// QEMU-specific Settings
+// Set to false to show VNC display for debugging Windows installation
+qemu_headless  = true
+// Longer boot wait for nested virtualization environments
+qemu_boot_wait = "10s"

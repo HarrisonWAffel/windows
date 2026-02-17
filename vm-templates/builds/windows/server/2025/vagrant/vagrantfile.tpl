@@ -3,6 +3,8 @@ Vagrant.configure("2") do |config|
   config.vm.communicator = "winrm"
   config.winrm.username = "$BUILD_USERNAME"
   config.winrm.password = "$BUILD_PASSWORD"
+  config.winrm.transport = :plaintext
+  config.winrm.basic_auth_only = true
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = 4096
@@ -15,9 +17,17 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provider "libvirt" do |lv|
+    lv.memory = 4096
+    lv.cpus = 4
+    lv.driver = "kvm"
+    lv.machine_type = "q35"
+    lv.disk_bus = "virtio"
+    lv.nic_model_type = "virtio"
     lv.graphics_type = "vnc"
     lv.graphics_ip = "0.0.0.0"
-    lv.graphics_port = 5900
-    lv.graphics_password = "$BUILD_PASSWORD"
+    lv.graphics_port = -1
+    lv.video_type = "qxl"
+    lv.video_vram = 65536
+    lv.channel :type => 'unix', :target_name => 'org.qemu.guest_agent.0', :target_type => 'virtio'
   end
 end

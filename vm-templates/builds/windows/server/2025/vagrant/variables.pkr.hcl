@@ -413,3 +413,18 @@ variable "vagrant_password" {
   type = string
   default = "vagrant"
 }
+
+// QEMU-specific Settings
+
+variable "qemu_headless" {
+  type        = bool
+  description = "Run QEMU in headless mode (no GUI). Set to false for debugging with VNC."
+  default     = true
+}
+
+variable "qemu_boot_wait" {
+  type        = string
+  description = "Time to wait before typing boot commands for QEMU. Longer for nested virt environments."
+  default     = "5s"
+}
+
