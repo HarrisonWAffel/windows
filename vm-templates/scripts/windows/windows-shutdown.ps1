@@ -45,7 +45,7 @@ Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
 
 # Build sysprep arguments
-$sysprepPath = "$env:SystemRoot\System32\Sysprep\sysprep.exe"
+$sysprepPath = "C:\\Windows\\system32\\Sysprep\\sysprep.exe"
 
 if ($null -ne $unattendPath -and (Test-Path $unattendPath)) {
     $sysprepArgs = "/generalize", "/oobe", "/shutdown", "/mode:vm", "/unattend:$unattendPath"
@@ -58,13 +58,7 @@ Write-Host ""
 Write-Host "Sysprep will shutdown the system when complete."
 Write-Host "=========================================="
 
-# Start sysprep WITHOUT waiting - it will shutdown the system itself
-# Using Start-Process without -Wait so the script can return to Packer
-# Sysprep's /shutdown flag will handle the actual shutdown
-Start-Process -FilePath $sysprepPath -ArgumentList $sysprepArgs -NoNewWindow
-
-# Give sysprep a moment to start before script exits
-Start-Sleep -Seconds 5
+Start-Process -FilePath $sysprepPath -ArgumentList $sysprepArgs -Wait -PassThru
 
 Write-Host "Sysprep started. System will shutdown shortly..."
 

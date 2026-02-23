@@ -183,7 +183,7 @@ source "qemu" "windows-server-datacenter-dexp" {
   boot_key_interval = "50ms"
 
   // Shutdown
-  shutdown_timeout = var.common_shutdown_timeout
+  shutdown_timeout = var.vm_shutdown_timeout  
   shutdown_command = var.vm_shutdown_command
 }
 

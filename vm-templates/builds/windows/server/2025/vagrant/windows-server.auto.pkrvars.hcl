@@ -65,6 +65,7 @@ vm_boot_wait        = "2s"
 vm_boot_command     = ["<spacebar>"]
 // Shutdown command is a fallback - sysprep is run by windows-shutdown.ps1 provisioner
 vm_shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
+vm_shutdown_timeout = "15m"
 
 // Communicator Settings
 communicator_port    = 5985
