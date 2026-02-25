@@ -63,8 +63,8 @@ iso_checksum_value = "d0ef4502e350e3c6c53c15b1b3020d38a5ded011bf04998e950720ac85
 vm_boot_order       = "disk,cdrom"
 vm_boot_wait        = "2s"
 vm_boot_command     = ["<spacebar>"]
-// Shutdown command is a fallback - sysprep is run by windows-shutdown.ps1 provisioner
-vm_shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
+// sysprep and shutdown vm
+vm_shutdown_command = "powershell -File E:\\windows-shutdown.ps1"
 vm_shutdown_timeout = "15m"
 
 // Communicator Settings
@@ -76,7 +76,7 @@ vagrant_username = "vagrant"
 vagrant_password = "vagrant"
 
 // Provisioner Settings
-preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-disable-tpm.ps1", "scripts/windows/windows-vagrant-vmtools.ps1", "scripts/windows/windows-qemu-tools.ps1"]
+preparationScripts = ["scripts/windows/windows-prepare.ps1", "scripts/windows/windows-disable-tpm.ps1", "scripts/windows/windows-vagrant-vmtools.ps1", "scripts/windows/windows-qemu-tools.ps1", "scripts/windows/windows-compress.ps1"]
 
 // QEMU-specific Settings
 // Set to false to show VNC display for debugging Windows installation

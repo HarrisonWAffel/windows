@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
     lv.memory = 4096
     lv.cpus = 4
     lv.driver = "kvm"
-    lv.machine_type = "q35"
+    lv.machine_type = "pc"
     lv.disk_bus = "virtio"
     lv.nic_model_type = "virtio"
     lv.graphics_type = "vnc"
@@ -28,6 +28,7 @@ Vagrant.configure("2") do |config|
     lv.graphics_port = -1
     lv.video_type = "qxl"
     lv.video_vram = 65536
+    lv.management_network_mode = "nat"
     lv.channel :type => 'unix', :target_name => 'org.qemu.guest_agent.0', :target_type => 'virtio'
   end
 end

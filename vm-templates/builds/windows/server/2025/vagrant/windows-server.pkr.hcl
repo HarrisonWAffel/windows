@@ -183,7 +183,7 @@ source "qemu" "windows-server-datacenter-dexp" {
   boot_key_interval = "50ms"
 
   // Shutdown
-  shutdown_timeout = var.vm_shutdown_timeout  
+  shutdown_timeout = var.common_shutdown_timeout
   shutdown_command = var.vm_shutdown_command
 }
 
@@ -237,18 +237,17 @@ build {
     ]
   }
 
-  // Run sysprep and shutdown via script - this MUST be the last provisioner
-  // because sysprep will shutdown the VM
-  provisioner "powershell" {
-    elevated_user     = var.vagrant_username
-    elevated_password = var.vagrant_password
-    script            = "${path.cwd}/scripts/windows/windows-shutdown.ps1"
+  provisioner "windows-restart" {
+    pause_before = "30s"
+    restart_check_command = "powershell -command \"& {Write-Output 'restarted.'}\""
+    restart_timeout       = "10m"
+    max_retries           = 6
   }
 
   post-processor "vagrant" {
     keep_input_artifact = true
     output = "output/windows2025-{{.Provider}}.box"
-    vagrantfile_template = "${abspath(path.root)}/Vagrantfile.pkg"
+    vagrantfile_template = "${abspath(path.root)}/vagrantfile.tpl"
   }
 
   post-processor "shell-local" {

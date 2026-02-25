@@ -6,11 +6,17 @@
 <#
     .DESCRIPTION
     Installs QEMU Guest Agent and VirtIO drivers for Vagrant/libvirt boxes.
-    This script is run when building QEMU-based images.
+    This script is run as a Packer provisioner when building QEMU-based images.
 
-    The VirtIO drivers are installed AFTER Windows is installed (using IDE/e1000),
-    so that when the Vagrant box runs with libvirt using VirtIO devices,
-    the drivers are already present and ready.
+    Build strategy:
+      - Windows is installed using IDE disk and e1000 network (natively supported
+        by Windows PE, no driver chicken-and-egg problem).
+      - This script then downloads the virtio-win ISO and installs all VirtIO
+        drivers (viostor, NetKVM, balloon, etc.) into the Windows driver store
+        via pnputil, plus the QEMU Guest Agent and VirtIO Guest Tools MSIs.
+      - The resulting qcow2 image is controller-agnostic. When the Vagrant box
+        runs with libvirt using VirtIO disk bus and VirtIO NIC, the pre-installed
+        drivers are automatically loaded by Windows.
 #>
 
 $ErrorActionPreference = "Stop"
@@ -25,17 +31,21 @@ Write-Host "=========================================="
 Write-Host "Installing QEMU Guest Agent and VirtIO drivers..."
 Write-Host "=========================================="
 
-# Try to find VirtIO ISO on CD drives first
+# Try to find VirtIO ISO already mounted on a CD drive (e.g. if manually attached)
 $virtioDrivers = $null
 $drives = @('D:', 'E:', 'F:', 'G:')
+$probeSubPaths = @("viostor\2k25\amd64", "viostor\2k22\amd64", "vioscsi\2k25\amd64", "vioscsi\2k22\amd64")
 
 foreach ($drive in $drives) {
-    $testPath = Join-Path $drive "vioscsi\2k22\amd64"
-    if (Test-Path $testPath) {
-        $virtioDrivers = $drive
-        Write-Host "Found VirtIO drivers ISO mounted on $drive"
-        break
+    foreach ($probe in $probeSubPaths) {
+        $testPath = Join-Path $drive $probe
+        if (Test-Path $testPath) {
+            $virtioDrivers = $drive
+            Write-Host "Found VirtIO drivers ISO mounted on $drive (detected via $probe)"
+            break
+        }
     }
+    if ($null -ne $virtioDrivers) { break }
 }
 
 # If not found on CD, download the ISO
@@ -74,21 +84,34 @@ if ($null -eq $virtioDrivers) {
 Write-Host ""
 Write-Host "Installing VirtIO drivers..."
 
-$driverFolders = @(
-    "vioscsi\2k22\amd64",   # SCSI controller (for virtio-scsi disk)
-    "viostor\2k22\amd64",   # Block storage (for virtio-blk disk)
-    "NetKVM\2k22\amd64",    # Network adapter (for virtio-net)
-    "Balloon\2k22\amd64",   # Memory balloon
-    "vioserial\2k22\amd64", # Serial console
-    "qxldod\2k22\amd64",    # QXL display driver
-    "pvpanic\2k22\amd64",   # Panic device
-    "vioinput\2k22\amd64",  # Input devices
-    "viorng\2k22\amd64"     # Random number generator
+# Helper: resolve driver path, preferring 2k25 (Server 2025) then falling back to 2k22
+function Resolve-DriverPath {
+    param([string]$DriverName)
+    $candidates = @("$DriverName\2k25\amd64", "$DriverName\2k22\amd64")
+    foreach ($candidate in $candidates) {
+        $fullPath = Join-Path $virtioDrivers $candidate
+        if (Test-Path $fullPath) {
+            return $fullPath
+        }
+    }
+    return $null
+}
+
+$driverNames = @(
+    "viostor",    # Block storage (for virtio-blk disk)
+    "vioscsi",    # SCSI controller (for virtio-scsi disk)
+    "NetKVM",     # Network adapter (for virtio-net)
+    "Balloon",    # Memory balloon
+    "vioserial",  # Serial console
+    "qxldod",     # QXL display driver
+    "pvpanic",    # Panic device
+    "vioinput",   # Input devices
+    "viorng"      # Random number generator
 )
 
-foreach ($folder in $driverFolders) {
-    $driverPath = Join-Path $virtioDrivers $folder
-    if (Test-Path $driverPath) {
+foreach ($name in $driverNames) {
+    $driverPath = Resolve-DriverPath $name
+    if ($null -ne $driverPath) {
         Write-Host "Installing drivers from: $driverPath"
         $infFiles = Get-ChildItem -Path $driverPath -Filter "*.inf" -ErrorAction SilentlyContinue
         foreach ($inf in $infFiles) {
@@ -101,7 +124,7 @@ foreach ($folder in $driverFolders) {
             }
         }
     } else {
-        Write-Host "Skipping (not found): $folder"
+        Write-Host "Skipping (not found on ISO): $name"
     }
 }
 

@@ -11,8 +11,10 @@
       - vm_inst_os_image: Windows edition index to install
       - vm_guest_os_timezone: timezone setting
 
-    QEMU configuration uses IDE disk and e1000 network for maximum compatibility
-    (no special drivers required during Windows PE phase).
+    QEMU configuration uses IDE disk and e1000 network during installation for
+    maximum compatibility. VirtIO drivers are installed post-install by the
+    windows-qemu-tools.ps1 provisioner so the resulting image works with VirtIO
+    devices at runtime.
 -->
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
    <settings pass="windowsPE">
@@ -253,8 +255,6 @@
             </SynchronousCommand>
 %{ if vm_virtualization_platform == "qemu" ~}
             <!-- QEMU/KVM: Run initialization script from Packer CD -->
-            <!-- With IDE disk and e1000 network, no special drivers needed -->
-            <!-- Search multiple drives since CD-ROM letters may vary -->
             <SynchronousCommand wcm:action="add">
                <CommandLine>cmd /c "for %%d in (D E F G) do if exist %%d:\windows-init.ps1 %SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File %%d:\windows-init.ps1"</CommandLine>
                <Order>4</Order>
