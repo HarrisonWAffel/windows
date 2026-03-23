@@ -226,17 +226,6 @@ build {
     destination = "C:\\autounattend.xml"
   }
 
-  // Generate Vagrantfile BEFORE shutdown (must run while VM is still up)
-  provisioner "shell-local" {
-    environment_vars = [
-      "BUILD_USERNAME=${var.vagrant_username}",
-      "BUILD_PASSWORD=${var.vagrant_password}"
-    ]
-    inline = [
-      "envsubst < ${abspath(path.root)}/vagrantfile.tpl > ${abspath(path.root)}/Vagrantfile.pkg"
-    ]
-  }
-
   provisioner "windows-restart" {
     pause_before = "30s"
     restart_check_command = "powershell -command \"& {Write-Output 'restarted.'}\""
@@ -248,9 +237,5 @@ build {
     keep_input_artifact = true
     output = "output/windows2025-{{.Provider}}.box"
     vagrantfile_template = "${abspath(path.root)}/vagrantfile.tpl"
-  }
-
-  post-processor "shell-local" {
-    inline = ["rm ${abspath(path.root)}/Vagrantfile.pkg"]
   }
 }

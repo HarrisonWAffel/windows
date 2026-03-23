@@ -82,12 +82,19 @@ Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
 # Install Chocolatey
 Write-Output "Installing Chocolatey..."
 
-Invoke-Expression ((New-Object net.webclient).DownloadString("https://community.chocolatey.org/install.ps1"))
-choco feature enable -n allowGlobalConfirmation
-choco install dotnetfx -y
-choco install visualstudio2019buildtools -y
-choco install netfx-4.8-devpack -y
-choco install dotnet-sdk -y
+$OSCaption = (Get-CimInstance Win32_OperatingSystem).Caption
+if ($OSCaption -match "Windows Server 2019") {
+    $env:chocolateyVersion = '1.4.0'
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    choco feature enable -n allowGlobalConfirmation
+} else {
+    Invoke-Expression ((New-Object net.webclient).DownloadString("https://community.chocolatey.org/install.ps1"))
+    choco feature enable -n allowGlobalConfirmation
+    choco install dotnetfx -y
+    choco install visualstudio2019buildtools -y
+    choco install netfx-4.8-devpack -y
+    choco install dotnet-sdk -y
+}
 
 # Temporarily disable firewall until the ports all get sorted.
 Write-Output "Disabling Windows firewall until all ports are sorted for K8s..."

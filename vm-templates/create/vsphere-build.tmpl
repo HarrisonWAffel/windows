@@ -17,14 +17,14 @@ follow_link() {
 }
 
 SCRIPT_PATH=$(realpath "$(dirname "$(follow_link "$0")")")
-CONFIG_PATH=$(realpath "${1:-${SCRIPT_PATH}/config}")
+CONFIG_PATH=$(realpath "${1:-$(dirname ${SCRIPT_PATH})/config}")
 
 {{- $func_index := 0 }}
 {{ range $menu := (ds "build").menu -}}
 {{ range $submenu := $menu.submenu -}}
 {{ $func_index = math.Add $func_index 1 }}
 menu_option_{{ $func_index }}() {
-  INPUT_PATH="$SCRIPT_PATH"/{{ $submenu.build.path }}
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/{{ $submenu.build.path }}
   {{ $message := "" -}}
   {{- if (coll.Has $submenu "message") -}}
   {{- $message = $submenu.message -}}

@@ -17,10 +17,10 @@ follow_link() {
 }
 
 SCRIPT_PATH=$(realpath "$(dirname "$(follow_link "$0")")")
-CONFIG_PATH=$(realpath "${1:-${SCRIPT_PATH}/config}")
+CONFIG_PATH=$(realpath "${1:-$(dirname ${SCRIPT_PATH})/config}")
 
 menu_option_1() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -65,7 +65,7 @@ menu_option_1() {
 }
 
 menu_option_2() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -111,7 +111,7 @@ menu_option_2() {
 }
 
 menu_option_3() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -157,7 +157,7 @@ menu_option_3() {
 }
 
 menu_option_4() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -203,7 +203,7 @@ menu_option_4() {
 }
 
 menu_option_5() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -249,7 +249,7 @@ menu_option_5() {
 }
 
 menu_option_6() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -295,7 +295,7 @@ menu_option_6() {
 }
 
 menu_option_7() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2025/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2025/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -341,7 +341,7 @@ menu_option_7() {
 }
 
 menu_option_8() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -386,7 +386,7 @@ menu_option_8() {
 }
 
 menu_option_9() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -432,7 +432,7 @@ menu_option_9() {
 }
 
 menu_option_10() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -478,7 +478,7 @@ menu_option_10() {
 }
 
 menu_option_11() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -524,7 +524,7 @@ menu_option_11() {
 }
 
 menu_option_12() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -570,7 +570,7 @@ menu_option_12() {
 }
 
 menu_option_13() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -616,7 +616,7 @@ menu_option_13() {
 }
 
 menu_option_14() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2022/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2022/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -662,7 +662,7 @@ menu_option_14() {
 }
 
 menu_option_15() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -707,7 +707,7 @@ menu_option_15() {
 }
 
 menu_option_16() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -753,7 +753,7 @@ menu_option_16() {
 }
 
 menu_option_17() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -799,7 +799,7 @@ menu_option_17() {
 }
 
 menu_option_18() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -845,7 +845,7 @@ menu_option_18() {
 }
 
 menu_option_19() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -891,7 +891,7 @@ menu_option_19() {
 }
 
 menu_option_20() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
@@ -937,7 +937,7 @@ menu_option_20() {
 }
 
 menu_option_21() {
-  INPUT_PATH="$SCRIPT_PATH"/builds/windows/server/2019/
+  INPUT_PATH="$(dirname $SCRIPT_PATH)"/builds/windows/server/2019/vsphere
   echo "Do you want to provide a custom name prefix for this template? This can be helpful for creating debug templates."
   echo "By default all templates use the format of '[prefix-][OSType]-[Year]-[Edition]-v[Year].[Month]'"
   echo "(e.g. windows-server-2022-standard-core-v24.12)"
